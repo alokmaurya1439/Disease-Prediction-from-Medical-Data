@@ -22,7 +22,7 @@ with st.sidebar:
     st.info("""
         This application predicts the risk of heart disease using machine learning. 
         🔍 Model: Random Forest / SVM / XGBoost  
-        📊 Accuracy: ~80%  
+        📊 Accuracy: ~84%  
         🧠 Input: Patient medical data  
         🎯 Output: Risk level (Low / High)
 
@@ -33,17 +33,14 @@ with st.sidebar:
     
     st.write(
         "**Features**:" 
-        "Age, Sex, Chest Pain Type, Resting Blood Pressure, Serum cholesterol, Fasting Blood Sugar" 
-        "Resting ECG, Max Heart Rate, Exercise Induced Angina, ST depression, Slope, CA (number of vessels)," 
-        "Thal"
+        "Age, Sex, Chest Pain Type, Max Heart Rate, Exercise Induced Angina, ST depression, Slope, CA (number of vessels), Thal" 
+       
     )
     st.markdown("---")
 
     st.subheader("Units")
     st.sidebar.markdown("""
         - **Age** → Years  
-        - **Blood Pressure** → mm Hg  
-        - **Cholesterol** → mg/dL  
         - **Max Heart Rate** → bpm  
         - **ST Depression (Oldpeak)** → Numeric value  
         - **CA (Blocked Vessels)** → 0–3  
@@ -66,11 +63,6 @@ thal_dict = {
         "Reversible defect": 3,
         }
 
-rest_dict = {
-        "Normal": 0,
-        "ST-T wave abnormality": 1,
-        "Left ventricular hypertrophy": 2,
-        }
 
 slope_dict = {
         "Upsloping": 0,
@@ -89,35 +81,29 @@ with col1:
     cp = st.selectbox("**Chest Pain**", 
        ["Select"] + list(cp_dict.keys()), index=0)
        
-    trestbps = st.number_input(
-                "**Blood Pressure(mm Hg) BP**", min_value=0, max_value=500, value=80
-            )
-    thal = st.selectbox("**Thalassemia(Blood disorder test)**", ["Select"] + list(thal_dict.keys()), index=0)
     
 
 with col2:
-    chol = st.number_input("**Cholesterol(ml/dl)**", min_value=0, max_value=600, value=100)
-    fbs = st.radio("**Blood Sugar >= 120 mg/dL**", ["No", "Yes"], horizontal=True)
-    restecg = st.selectbox("**Heart electrical test**", ["Select"] + list(rest_dict.keys()), index=0)
+    thal = st.selectbox("**Blood flow defect**", ["Select"] + list(thal_dict.keys()), index=0)
+    
     thalach = st.number_input(
-                "**Maximum heart rate achieved**", min_value=0, max_value=230, value=60
+                "**Heart performance**", min_value=0, max_value=230, value=60
             )
-
+    exang = st.radio("**Exercise chest pain**", ["No", "Yes"], horizontal=True)
 
 with col3:
-    exang = st.radio("**Pain during exercise**", ["No", "Yes"], horizontal=True)
+   
     oldpeak = st.number_input(
-                "**ST depression (Heart stress indicator)**", min_value=0.0, max_value=7.0, value=1.0, step=0.1
+                "**Heart stress**", min_value=0.0, max_value=7.0, value=1.0, step=0.1
             )
-    slope = st.selectbox("**Heart graph slope**", ["Select"] + list(slope_dict.keys()), index=0)
-    ca = st.slider("**Number of Blocked Vessels**", 0, 4, 0)
+    slope = st.selectbox("**Heart Rate Measurement Report**", ["Select"] + list(slope_dict.keys()), index=0)
+    ca = st.slider("**Vessel blockage**", 0, 4, 0)
     
 st.header("🔍Prediction Result")
 if st.button("Analyze Risk"):
     missing_selection = (
         cp == "Select"
         or thal == "Select"
-        or restecg == "Select"
         or slope == "Select"
         )
 
@@ -132,13 +118,9 @@ if st.button("Analyze Risk"):
                 "age": [age],
                 "sex": [1 if sex == "Male" else 0],
                 "cp": [cp_dict[cp]],
-                "trestbps": [trestbps],
-                "chol": [chol],
-                "fbs": [1 if fbs == "Yes" else 0],
-                "restecg": [rest_dict[restecg]],
                 "thalach": [thalach],
                 "exang": [1 if exang == "Yes" else 0],
-                "oldpeak": [oldpeak],
+                "oldpeak": [float(oldpeak)],
                 "slope": [slope_dict[slope]],
                 "ca": [ca],
                 "thal": [thal_dict[thal]]
